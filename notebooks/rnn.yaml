@@ -1,0 +1,69 @@
+
+---
+
+## 🧮 RNN Equations
+
+Given:
+- \( x_t \): input at time step \( t \)
+- \( h_t \): hidden state at time step \( t \)
+- \( W, U, b \): weights and bias
+
+The update rule is:
+
+\[
+h_t = \tanh(W \cdot x_t + U \cdot h_{t-1} + b)
+\]
+
+---
+
+## 📘 Small Example: Predicting the Next Letter
+
+Suppose we are training an RNN to **predict the next character** in a word:
+
+### Example: `"HEL"` → Predict `"L"`  
+Sequence: `H → E → L`  
+Target: `E → L → L`
+
+### Step-by-Step:
+
+| Time Step (t) | Input (xₜ) | Hidden State (hₜ)         | Output (ŷₜ)     |
+|---------------|------------|----------------------------|------------------|
+| 0             | `'H'`      | h₀ (initial hidden state)  | --               |
+| 1             | `'E'`      | \( h_1 = \tanh(Wx + Uh_0) \) | Predict `'L'`   |
+| 2             | `'L'`      | \( h_2 = \tanh(Wx + Uh_1) \) | Predict `'L'`   |
+
+🧠 The hidden state **accumulates information** over time.
+
+---
+
+## 🧪 Toy Code Example in Python
+
+```python
+import numpy as np
+
+# Vocabulary
+vocab = ['H', 'E', 'L']
+char_to_idx = {ch: i for i, ch in enumerate(vocab)}
+
+# Inputs
+inputs = ['H', 'E', 'L']  # x_t
+targets = ['E', 'L', 'L'] # y_t
+
+# One-hot encoding
+def one_hot(char):
+    vec = np.zeros(len(vocab))
+    vec[char_to_idx[char]] = 1
+    return vec
+
+# Initialize weights and hidden state
+W = np.random.randn(3, 3)  # input weights
+U = np.random.randn(3, 3)  # hidden weights
+b = np.zeros(3)            # bias
+h_prev = np.zeros(3)       # initial hidden state
+
+# Forward pass
+for ch in inputs:
+    x = one_hot(ch)
+    h = np.tanh(np.dot(W, x) + np.dot(U, h_prev) + b)
+    h_prev = h
+    print("Hidden state:", h)
